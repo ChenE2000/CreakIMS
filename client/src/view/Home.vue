@@ -10,8 +10,7 @@
       <!-- 示例logo -->
     </div>
 
-      <div class="logo" />
-      <a-menu v-on:selectedKeys="selectedKeys" theme="dark" mode="inline" @click="onClickMenu">
+      <a-menu v-on:selectedKeys="data.selectedKeys" theme="dark" mode="inline" @click="onClickMenu">
         <a-menu-item key="data">
           <save-outlined />
           <span class="nav-text">数据管理</span>
@@ -24,14 +23,21 @@
           <robot-outlined />
           <span class="nav-text">模型管理</span>
         </a-menu-item>
-        <a-menu-item key="more">
+        <a-menu-item key="info">
           <user-outlined />
           <span class="nav-text">更多</span>
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
     <a-layout>
-      <a-layout-header :style="{ background: '#fff', padding: 0 }" />
+      <a-layout-header :style="{ background: '#fff', padding: 0 }">
+        <div class="user-info-container">
+          <a-avatar src="https://joeschmoe.io/api/v1/random" />
+          {{ data.user.name }}
+          </div>
+      </a-layout-header>
+
+
       <a-layout-content :style="{ margin: '24px 16px 0' }">
         <div :style="{ padding: '24px', background: '#fff', height: '100%' }">
          <router-view></router-view>
@@ -43,40 +49,43 @@
     </a-layout>
   </a-layout>
 </template>
-<script lang="ts">
-import { UserOutlined, SaveOutlined, RobotOutlined } from '@ant-design/icons-vue';
-import { defineComponent, ref } from 'vue';
-import { router } from '../router';
-export default defineComponent({
- 
-  components: {
-    UserOutlined,
-    SaveOutlined,
-    RobotOutlined,
-  },
-  methods: {
-    onClickMenu(e: Event) {
-      // console.log(e.key)
-      router.push(e.key)
-    }
-  },
-  setup() {
-    const onCollapse = (collapsed: boolean, type: string) => {
-      console.log(collapsed, type);
-    };
 
-    const onBreakpoint = (broken: boolean) => {
-      console.log(broken);
-    };
-    // 初始化到data页
-    router.push('data')
-    return {
-      selectedKeys: ref<string[]>(['data']),
-      onCollapse,
-      onBreakpoint,
-    };
-  },
-});
+
+<script setup lang="ts">
+import { UserOutlined, SaveOutlined, RobotOutlined } from '@ant-design/icons-vue';
+import { reactive, ref } from 'vue';
+import { router } from '../router';
+
+interface ClickEvent {
+  key: string;
+}
+
+const onClickMenu = (e: ClickEvent) => {
+  router.push(e.key)
+}
+
+const data = reactive(
+  {
+    user: {name: 'chenyi'},
+    selectedKeys: ref<string[]>(['data'])
+  }
+);
+const onCollapse = (collapsed: boolean, type: string) => {
+  console.log(collapsed, type);
+};
+
+const onBreakpoint = (broken: boolean) => {
+  console.log(broken);
+};
+//初始化到data页
+router.push('data')
+// return {
+//   selectedKeys: ref<string[]>(['data']),
+//   onCollapse,
+//   onBreakpoint,
+// };
+
+
 </script>
 <style>
 .banner {
@@ -97,5 +106,9 @@ export default defineComponent({
   background: #141414;
 }
 
+.user-info-container {
+  width: 8rem;
+  float: right;
+}
 
 </style>
