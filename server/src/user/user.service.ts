@@ -20,4 +20,17 @@ export class UserService {
       return false;
     }
   }
+
+  async getUserById(id: number) {
+    const user = await this.repository.findOneBy({
+      user_id: id,
+    });
+    return user;
+  }
+
+  async getAllUsers() {
+    const users = await this.repository.find();
+    console.log(users);
+    return users;
+  }
 }
