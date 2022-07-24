@@ -14,8 +14,12 @@ export const router = createRouter({
         {
           path: "user",
           component: () => import("../components/table-user.vue"),
-        }
-      ]
+        },
+      ],
+    },
+    {
+      path: "/login",
+      component: () => import("../components/TheLogin.vue"),
     },
     // {
     //   path: "/info",
@@ -23,4 +27,3 @@ export const router = createRouter({
     // }
   ],
 });
-
