@@ -20,7 +20,13 @@
           <a-tag
             v-for="tag in record.tags"
             :key="tag"
-            :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'"
+            :color="
+              tag === 'loser'
+                ? 'volcano'
+                : tag.length > 5
+                ? 'geekblue'
+                : 'green'
+            "
           >
             {{ tag.toUpperCase() }}
           </a-tag>
@@ -41,71 +47,56 @@
     </template>
   </a-table>
 </template>
-<script lang="ts">
-import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { SmileOutlined, DownOutlined } from "@ant-design/icons-vue";
 const columns = [
   {
-    name: 'Name',
-    dataIndex: 'name',
-    key: 'name',
+    name: "Name",
+    dataIndex: "name",
+    key: "name",
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
+    title: "Age",
+    dataIndex: "age",
+    key: "age",
   },
   {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    title: "Address",
+    dataIndex: "address",
+    key: "address",
   },
   {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
+    title: "Tags",
+    key: "tags",
+    dataIndex: "tags",
   },
   {
-    title: 'Action',
-    key: 'action',
+    title: "Action",
+    key: "action",
   },
 ];
 
 const data = [
   {
-    key: '1',
-    name: 'John Brown',
+    key: "1",
+    name: "John Brown",
     age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
+    address: "New York No. 1 Lake Park",
+    tags: ["nice", "developer"],
   },
   {
-    key: '2',
-    name: 'Jim Green',
+    key: "2",
+    name: "Jim Green",
     age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
+    address: "London No. 1 Lake Park",
+    tags: ["loser"],
   },
   {
-    key: '3',
-    name: 'Joe Black',
+    key: "3",
+    name: "Joe Black",
     age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
+    address: "Sidney No. 1 Lake Park",
+    tags: ["cool", "teacher"],
   },
 ];
-
-export default defineComponent({
-  components: {
-    SmileOutlined,
-    DownOutlined,
-  },
-  setup() {
-    return {
-      data,
-      columns,
-    };
-  },
-});
 </script>
-

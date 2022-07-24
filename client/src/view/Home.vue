@@ -11,7 +11,7 @@
     </div>
 
       <div class="logo" />
-      <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline" @click="onClickMenu">
+      <a-menu v-on:selectedKeys="selectedKeys" theme="dark" mode="inline" @click="onClickMenu">
         <a-menu-item key="data">
           <save-outlined />
           <span class="nav-text">数据管理</span>
