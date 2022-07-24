@@ -13,7 +13,7 @@ const show = ref(false);
 <template>
   <div class="login">
     <div class="login__container">
-      <h2 class="login__title">请输入你的密码</h2>
+      <h2 class="login__title">焊缝缺陷信息管理系统</h2>
       <figure class="login__admin-info">
         <img
           src="https://images.unsplash.com/photo-1658592597637-ed0d674acd0e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxM3x8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60"
@@ -55,15 +55,19 @@ const show = ref(false);
   justify-content: center;
   align-items: center;
   background: rgb(246, 246, 246);
+  background: url('../assets/bg.jpg');
+  background-size: cover;
 
   &__container {
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     min-width: 40rem;
     padding: 4rem 3rem;
-    background: #fff;
-    border-radius: 10px;
+    background: rgba(255,255,255, 0.75);
+    backdrop-filter: blur(0.5rem);
+    border-radius: 6px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
   }
 

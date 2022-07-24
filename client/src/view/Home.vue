@@ -32,7 +32,7 @@
     <a-layout>
       <a-layout-header :style="{ background: '#fff', padding: 0 }">
         <div class="user-info-container">
-          <a-avatar src="https://joeschmoe.io/api/v1/random" />
+          <a-avatar class="shadow-lt" src="https://joeschmoe.io/api/v1/random" />
           {{ data.user.name }}
           </div>
       </a-layout-header>
@@ -107,7 +107,8 @@ router.push('data')
 }
 
 .user-info-container {
-  width: 8rem;
+  /* padding: .5rem; */
+  width: 10rem;
   float: right;
 }
 
