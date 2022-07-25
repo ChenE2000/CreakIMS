@@ -1,34 +1,31 @@
 <template>
   <a-table :columns="columns" :data-source="data">
-    <template #headerCell="{ column }">
+    <!-- <template #headerCell="{ column }">
       <template v-if="column.key === 'name'">
         <span>
           <smile-outlined />
           Name
         </span>
       </template>
-    </template>
+    </template>-->
 
-    <template #bodyCell="{ column, record }">
+   <template #bodyCell="{ column, record }">
       <template v-if="column.key === 'name'">
-        <a>
-          {{ record.name }}
-        </a>
+        <p>
+          {{ record[column.title] }}
+        </p>
       </template>
       <template v-else-if="column.key === 'tags'">
         <span>
           <a-tag
-            v-for="tag in record.tags"
-            :key="tag"
+            
             :color="
-              tag === 'loser'
+              record.user_perm === '管理员'
                 ? 'volcano'
-                : tag.length > 5
-                ? 'geekblue'
-                : 'green'
+                :'geekblue'
             "
           >
-            {{ tag.toUpperCase() }}
+            {{ record.user_perm }}
           </a-tag>
         </span>
       </template>
@@ -44,32 +41,43 @@
           </a>
         </span>
       </template>
-    </template>
+  </template>
   </a-table>
 </template>
 <script setup lang="ts">
 import { SmileOutlined, DownOutlined } from "@ant-design/icons-vue";
+// import { Request } from "../api/http.api";
 const columns = [
   {
-    name: "Name",
-    dataIndex: "name",
+    title: "user_name",
+    dataIndex: "user_name",
     key: "name",
   },
   {
-    title: "Age",
-    dataIndex: "age",
-    key: "age",
+    title: "user_avatar",
+    dataIndex: "user_avatar",
+    key: "name",
   },
   {
-    title: "Address",
-    dataIndex: "address",
-    key: "address",
+    title: "user_status",
+    dataIndex: "user_status",
+    key: "name",
   },
   {
-    title: "Tags",
+    title: "user_perm",
     key: "tags",
-    dataIndex: "tags",
+    dataIndex: "user_perm",
   },
+{
+    title: "user_created_time",
+    key: "name",
+    dataIndex: "user_created_time",
+  },{
+    title: "user_last_login_time",
+    key: "name",
+    dataIndex: "user_last_login_time",
+  },
+
   {
     title: "Action",
     key: "action",
@@ -78,25 +86,16 @@ const columns = [
 
 const data = [
   {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    tags: ["nice", "developer"],
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-    tags: ["loser"],
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sidney No. 1 Lake Park",
-    tags: ["cool", "teacher"],
-  },
+    user_id: 1,
+    user_name: 'chenyi',
+    user_passwd: 'miwen',
+    user_avatar: 'https://joeschmoe.io/api/v1/random',
+    user_status: '1',
+    user_perm: '管理员',
+    user_created_time: '2022-07-24T05:08:53.000Z',
+    user_last_login_time: '2022-07-24T05:08:56.000Z'
+  }
 ];
+
+
 </script>
