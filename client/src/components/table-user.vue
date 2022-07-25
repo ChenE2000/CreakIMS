@@ -19,12 +19,7 @@
       </template>
 
 
-      <template v-if="column.key === 'name'">
-        <p>
-          {{ record[column.dataIndex] }}
-        </p>
-      </template>
-      <template v-else-if="column.key === 'perm'">
+      <template v-if="column.key === 'perm'">
         <span>
           <a-tag
             
@@ -55,7 +50,7 @@
 
       <template v-else-if="column.key === 'action'">
         <span>
-          <a>Invite 一 {{ record.name }}</a>
+          <a>Invite 一 {{ record.user_name }}</a>
           <a-divider type="vertical" />
           <a>Delete</a>
           <a-divider type="vertical" />
@@ -76,7 +71,7 @@ const columns = [
   {
     title: "用户名",
     dataIndex: "user_name",
-    key: "user_name",
+    key: "name",
   },
   // {
   //   title: "user_avatar",
@@ -95,11 +90,11 @@ const columns = [
   },
 {
     title: "用户创建时间",
-    key: "name",
+    key: "created_time",
     dataIndex: "user_created_time",
   },{
     title: "最后登录时间",
-    key: "name",
+    key: "ll_time",
     dataIndex: "user_last_login_time",
   },
 
