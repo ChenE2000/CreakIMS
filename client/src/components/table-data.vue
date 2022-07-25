@@ -70,6 +70,35 @@ const columns = [
   {
     title: "缺陷类型",
     dataIndex: "type",
+    filterMode: 'tree',
+    filterSearch: true,
+    filters: [
+      {
+        text: "未焊透",
+        value: "未焊透",
+      },
+      {
+        text: "裂纹",
+        value: "裂纹",
+      },
+      {
+        text: "夹渣",
+        value: "夹渣",
+      },
+      {
+        text: "未熔合",
+        value: "未熔合",
+      },
+      {
+        text: "气泡",
+        value: "气泡",
+      },
+      {
+        text: "未检测到缺陷",
+        value: "未检测到缺陷",
+      },
+    ],
+    onFilter: (value: string, record) => record.address.startsWith(value),
   },
   {
     title: "缺陷尺寸",
