@@ -10,24 +10,33 @@
     <template #bodyCell="{ column, text, record }">
       <template v-if="column.dataIndex === 'name'">
         <div class="editable-cell">
-          <div
-              v-if="editableData[record.key]"
-              class="editable-cell-input-wrapper"
-          >
-            <a-input
-                v-model:value="editableData[record.key].name"
-                @pressEnter="save(record.key)"
-            />
-            <check-outlined
-                class="editable-cell-icon-check"
-                @click="save(record.key)"
-            />
+          <div v-if="editableData[record.key]" class="editable-cell-input-wrapper">
+            <a-input v-model:value="editableData[record.key].name" @pressEnter="save(record.key)" />
+            <check-outlined class="editable-cell-icon-check" @click="save(record.key)" />
           </div>
           <div v-else class="editable-cell-text-wrapper">
-            {{ text || " " }}
-            <edit-outlined class="editable-cell-icon"/>
+            {{ text || ' ' }}
+            <edit-outlined class="editable-cell-icon" @click="edit(record.key)" />
           </div>
         </div>
+      </template>
+      <template v-else-if="column.dataIndex === 'type'">
+        <span>
+          <a-tag
+              v-for="tag in record.type.split(',')"
+              :key="tag"
+              :color="
+              tag === '未焊透'
+              ? 'blue'
+              : tag === '裂纹' ? 'cyan'
+              : tag === '夹渣'? 'green'
+              : tag === '未熔合' ? 'lime'
+              : tag === '气泡'? 'yellow'
+              : tag === '未检测到缺陷' ? 'gold' : 'volcano'"
+          >
+            {{ tag }}
+          </a-tag>
+        </span>
       </template>
       <template v-else-if="column.dataIndex === 'operation'">
         <a-popconfirm
@@ -45,6 +54,7 @@
 <script setup lang="ts">
 import {computed, reactive, Ref, ref} from "vue";
 import {CheckOutlined, EditOutlined} from "@ant-design/icons-vue";
+import {cloneDeep} from "lodash-es";
 
 // import { cloneDeep } from 'lodash-es';
 
@@ -98,7 +108,7 @@ const columns = [
         value: "未检测到缺陷",
       },
     ],
-    onFilter: (value: string, record) => record.address.startsWith(value),
+    onFilter: (value: string, record) => record.type.startsWith(value),
   },
   {
     title: "缺陷尺寸",
@@ -117,16 +127,16 @@ const columns = [
 const dataSource: Ref<DataItem[]> = ref([
   {
     key: "0",
-    name: "1.jpg",
-    index: "0-0",
-    type: "未焊透", //未焊透、裂纹、夹渣、未熔合、气泡、未检测到缺陷
+    name: "1",
+    index: "1",
+    type: "未焊透,裂纹",
     size: "134*783",
     info: "最大气孔",
   },
   {
     key: "1",
-    name: "2.jpg",
-    index: "1-0",
+    name: "2",
+    index: "2",
     type: "未熔合",
     size: "144*383",
     info: "walalalal",
@@ -135,14 +145,11 @@ const dataSource: Ref<DataItem[]> = ref([
 const count = computed(() => dataSource.value.length + 1);
 const editableData = reactive({});
 
-// const edit = (key: string) => {
-//   editableData[key] = cloneDeep(dataSource.value.filter(item => key === item.key)[0]);
-// };
+const edit = (key: string) => {
+  editableData[key] = cloneDeep(dataSource.value.filter(item => key === item.key)[0]);
+};
 const save = (key: string) => {
-  Object.assign(
-      dataSource.value.filter((item) => key === item.key)[0],
-      editableData[key]
-  );
+  Object.assign(dataSource.value.filter(item => key === item.key)[0], editableData[key]);
   delete editableData[key];
 };
 
