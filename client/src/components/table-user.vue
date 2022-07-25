@@ -10,12 +10,21 @@
     </template>-->
 
    <template #bodyCell="{ column, record }">
+      <template v-if="column.key === 'user_name'">
+      
+        <div class="inline-flex">
+          <a-avatar class="shadow-lt" src="https://joeschmoe.io/api/v1/random" :style="{margin: '0 2rem'}" />
+          {{ record[column.dataIndex] }}
+        </div>
+      </template>
+
+
       <template v-if="column.key === 'name'">
         <p>
-          {{ record[column.title] }}
+          {{ record[column.dataIndex] }}
         </p>
       </template>
-      <template v-else-if="column.key === 'tags'">
+      <template v-else-if="column.key === 'perm'">
         <span>
           <a-tag
             
@@ -29,6 +38,21 @@
           </a-tag>
         </span>
       </template>
+
+     <template v-else-if="column.key === 'status'">
+        <span>
+          <a-tag
+            :color="
+              record.status === '0'
+                ? 'red'
+                :'green'
+            "
+          >
+            {{ record.status === '0' ? '冻结':'激活' }}
+          </a-tag>
+        </span>
+      </template>
+
       <template v-else-if="column.key === 'action'">
         <span>
           <a>Invite 一 {{ record.name }}</a>
@@ -46,56 +70,67 @@
 </template>
 <script setup lang="ts">
 import { SmileOutlined, DownOutlined } from "@ant-design/icons-vue";
-// import { Request } from "../api/http.api";
+import { reactive, ref } from "vue";
+import { getAllUsers } from "../api/api";
 const columns = [
   {
-    title: "user_name",
+    title: "用户名",
     dataIndex: "user_name",
-    key: "name",
+    key: "user_name",
   },
+  // {
+  //   title: "user_avatar",
+  //   dataIndex: "user_avatar",
+  //   key: "hide",
+  // },
   {
-    title: "user_avatar",
-    dataIndex: "user_avatar",
-    key: "name",
-  },
-  {
-    title: "user_status",
+    title: "用户状态",
     dataIndex: "user_status",
-    key: "name",
+    key: "status",
   },
   {
-    title: "user_perm",
-    key: "tags",
+    title: "用户权限",
+    key: "perm",
     dataIndex: "user_perm",
   },
 {
-    title: "user_created_time",
+    title: "用户创建时间",
     key: "name",
     dataIndex: "user_created_time",
   },{
-    title: "user_last_login_time",
+    title: "最后登录时间",
     key: "name",
     dataIndex: "user_last_login_time",
   },
 
   {
-    title: "Action",
+    title: "操作",
     key: "action",
   },
 ];
 
-const data = [
-  {
-    user_id: 1,
-    user_name: 'chenyi',
-    user_passwd: 'miwen',
-    user_avatar: 'https://joeschmoe.io/api/v1/random',
-    user_status: '1',
-    user_perm: '管理员',
-    user_created_time: '2022-07-24T05:08:53.000Z',
-    user_last_login_time: '2022-07-24T05:08:56.000Z'
-  }
-];
+// [
+  // {
+  //   user_id: 1,
+  //   user_name: 'chenyi',
+  //   user_passwd: 'miwen',
+  //   user_avatar: 'https://joeschmoe.io/api/v1/random',
+  //   user_status: '1',
+  //   user_perm: '管理员',
+  //   user_created_time: '2022-07-24T05:08:53.000Z',
+  //   user_last_login_time: '2022-07-24T05:08:56.000Z'
+  // }
+// ]
+
+// const data = reactive({})
+let data = ref()
+
+
+getAllUsers().then(res =>{
+  console.log(res.data);
+  data.value = res.data
+
+})
 
 
 </script>
