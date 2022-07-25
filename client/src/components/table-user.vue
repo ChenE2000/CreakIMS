@@ -19,7 +19,12 @@
       </template>
 
 
-      <template v-if="column.key === 'perm'">
+      <template v-if="column.key === 'name'">
+        <span>
+          {{ record[column.dataIndex] }}
+        </span>
+      </template>
+      <template v-else-if="column.key === 'perm'">
         <span>
           <a-tag
             
@@ -71,7 +76,7 @@ const columns = [
   {
     title: "用户名",
     dataIndex: "user_name",
-    key: "name",
+    key: "user_name",
   },
   // {
   //   title: "user_avatar",
@@ -90,11 +95,11 @@ const columns = [
   },
 {
     title: "用户创建时间",
-    key: "created_time",
+    key: "name",
     dataIndex: "user_created_time",
   },{
     title: "最后登录时间",
-    key: "ll_time",
+    key: "name",
     dataIndex: "user_last_login_time",
   },
 
