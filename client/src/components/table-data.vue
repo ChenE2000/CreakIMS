@@ -1,38 +1,39 @@
 <template>
   <a-button
-    class="editable-add-btn"
-    style="margin-bottom: 8px"
-    @click="handleAdd"
-    >Add</a-button
+      class="editable-add-btn"
+      style="margin-bottom: 8px"
+      @click="handleAdd"
+  >Add
+  </a-button
   >
   <a-table bordered :data-source="dataSource" :columns="columns">
     <template #bodyCell="{ column, text, record }">
       <template v-if="column.dataIndex === 'name'">
         <div class="editable-cell">
           <div
-            v-if="editableData[record.key]"
-            class="editable-cell-input-wrapper"
+              v-if="editableData[record.key]"
+              class="editable-cell-input-wrapper"
           >
             <a-input
-              v-model:value="editableData[record.key].name"
-              @pressEnter="save(record.key)"
+                v-model:value="editableData[record.key].name"
+                @pressEnter="save(record.key)"
             />
             <check-outlined
-              class="editable-cell-icon-check"
-              @click="save(record.key)"
+                class="editable-cell-icon-check"
+                @click="save(record.key)"
             />
           </div>
           <div v-else class="editable-cell-text-wrapper">
             {{ text || " " }}
-            <edit-outlined class="editable-cell-icon" />
+            <edit-outlined class="editable-cell-icon"/>
           </div>
         </div>
       </template>
       <template v-else-if="column.dataIndex === 'operation'">
         <a-popconfirm
-          v-if="dataSource.length"
-          title="Sure to delete?"
-          @confirm="onDelete(record.key)"
+            v-if="dataSource.length"
+            title="Sure to delete?"
+            @confirm="onDelete(record.key)"
         >
           <a>Delete</a>
         </a-popconfirm>
@@ -42,49 +43,64 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, Ref, ref } from "vue";
-import { CheckOutlined, EditOutlined } from "@ant-design/icons-vue";
+import {computed, reactive, Ref, ref} from "vue";
+import {CheckOutlined, EditOutlined} from "@ant-design/icons-vue";
+
 // import { cloneDeep } from 'lodash-es';
 
 interface DataItem {
   key: string;
   name: string;
-  age: number;
-  address: string;
+  index: string;
+  type: string;
+  size: string;
+  info: string;
 }
 
 const columns = [
   {
-    title: "name",
+    title: "样本名称",
     dataIndex: "name",
     width: "30%",
   },
   {
-    title: "age",
-    dataIndex: "age",
+    title: "缺陷序号",
+    dataIndex: "index",
   },
   {
-    title: "address",
-    dataIndex: "address",
+    title: "缺陷类型",
+    dataIndex: "type",
+  },
+  {
+    title: "缺陷尺寸",
+    dataIndex: "size"
+  },
+  {
+    title: "缺陷信息",
+    dataIndex: "info"
   },
   {
     title: "operation",
-    dataIndex: "operation",
+    dataIndex: "operation"
   },
 ];
 
 const dataSource: Ref<DataItem[]> = ref([
   {
     key: "0",
-    name: "Edward King 0",
-    age: 32,
-    address: "London, Park Lane no. 0",
+    name: "1.jpg",
+    index: "0-0",
+    type: "未焊透", //未焊透、裂纹、夹渣、未熔合、气泡、未检测到缺陷
+    size: "134*783",
+    info: "最大气孔",
   },
   {
     key: "1",
-    name: "Edward King 1",
-    age: 32,
-    address: "London, Park Lane no. 1",
+    name: "2.jpg",
+    index: "1-0",
+    type: "未熔合",
+    size: "144*383",
+    info: "walalalal",
   },
 ]);
 const count = computed(() => dataSource.value.length + 1);
@@ -95,8 +111,8 @@ const editableData = reactive({});
 // };
 const save = (key: string) => {
   Object.assign(
-    dataSource.value.filter((item) => key === item.key)[0],
-    editableData[key]
+      dataSource.value.filter((item) => key === item.key)[0],
+      editableData[key]
   );
   delete editableData[key];
 };
@@ -107,9 +123,11 @@ const onDelete = (key: string) => {
 const handleAdd = () => {
   const newData = {
     key: `${count.value}`,
-    name: `Edward King ${count.value}`,
-    age: 32,
-    address: `London, Park Lane no. ${count.value}`,
+    name: `${count.value}.jpg`,
+    index: `${count.value - 1}-0`,
+    type: "未焊透",
+    size: "134*783",
+    info: "最大气孔",
   };
   dataSource.value.push(newData);
 };
@@ -118,6 +136,7 @@ const handleAdd = () => {
 <style lang="less">
 .editable-cell {
   position: relative;
+
   .editable-cell-input-wrapper,
   .editable-cell-text-wrapper {
     padding-right: 24px;
@@ -153,6 +172,7 @@ const handleAdd = () => {
     margin-bottom: 8px;
   }
 }
+
 .editable-cell:hover .editable-cell-icon {
   display: inline-block;
 }
