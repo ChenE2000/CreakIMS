@@ -7,16 +7,68 @@
   </a-button
   >
   <a-table bordered :data-source="dataSource" :columns="columns">
+    <template #customFilterIcon="{ filtered, column }">
+      <template v-if="column.dataIndex === 'name'">
+        <search-outlined/>
+      </template>
+      <template v-else>
+        <filter-outlined/>
+      </template>
+    </template>
+    <template
+        #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
+    >
+      <div style="padding: 8px">
+        <a-input
+            ref="searchInput"
+            :placeholder="`Search ${column.dataIndex}`"
+            :value="selectedKeys[0]"
+            style="width: 188px; margin-bottom: 8px; display: block"
+            @change="e => setSelectedKeys(e.target.value ? [e.target.value] : [])"
+            @pressEnter="handleSearch(selectedKeys, confirm, column.dataIndex)"
+        />
+        <a-button
+            type="primary"
+            size="small"
+            style="width: 90px; margin-right: 8px"
+            @click="handleSearch(selectedKeys, confirm, column.dataIndex)"
+        >
+          <template #icon>
+            <SearchOutlined/>
+          </template>
+          Search
+        </a-button>
+        <a-button size="small" style="width: 90px" @click="handleReset(clearFilters)">
+          Reset
+        </a-button>
+      </div>
+    </template>
     <template #bodyCell="{ column, text, record }">
       <template v-if="column.dataIndex === 'name'">
-        <div class="editable-cell">
+        <span v-if="state.searchText && state.searchedColumn === column.dataIndex">
+        <template
+            v-for="(fragment, i) in text
+            .toString()
+            .split(new RegExp(`(?<=${state.searchText})|(?=${state.searchText})`, 'i'))"
+        >
+          <mark
+              v-if="fragment.toLowerCase() === state.searchText.toLowerCase()"
+              :key="i"
+              class="highlight"
+          >
+            {{ fragment }}
+          </mark>
+          <template v-else>{{ fragment }}</template>
+        </template>
+      </span>
+        <div v-else class="editable-cell">
           <div v-if="editableData[record.key]" class="editable-cell-input-wrapper">
-            <a-input v-model:value="editableData[record.key].name" @pressEnter="save(record.key)" />
-            <check-outlined class="editable-cell-icon-check" @click="save(record.key)" />
+            <a-input v-model:value="editableData[record.key].name" @pressEnter="save(record.key)"/>
+            <check-outlined class="editable-cell-icon-check" @click="save(record.key)"/>
           </div>
           <div v-else class="editable-cell-text-wrapper">
             {{ text || ' ' }}
-            <edit-outlined class="editable-cell-icon" @click="edit(record.key)" />
+            <edit-outlined class="editable-cell-icon" @click="edit(record.key)"/>
           </div>
         </div>
       </template>
@@ -53,7 +105,7 @@
 
 <script setup lang="ts">
 import {computed, reactive, Ref, ref} from "vue";
-import {CheckOutlined, EditOutlined} from "@ant-design/icons-vue";
+import {CheckOutlined, EditOutlined, SearchOutlined, FilterOutlined} from "@ant-design/icons-vue";
 import {cloneDeep} from "lodash-es";
 
 // import { cloneDeep } from 'lodash-es';
@@ -72,6 +124,16 @@ const columns = [
     title: "样本名称",
     dataIndex: "name",
     width: "30%",
+    customFilterDropdown: true,
+    onFilter: (value, record) =>
+        record.name.toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => {
+          searchInput.value.focus();
+        }, 100);
+      }
+    },
   },
   {
     title: "缺陷序号",
@@ -145,6 +207,25 @@ const dataSource: Ref<DataItem[]> = ref([
 const count = computed(() => dataSource.value.length + 1);
 const editableData = reactive({});
 
+const state = reactive({
+  searchText: '',
+  searchedColumn: '',
+});
+
+const searchInput = ref();
+
+const handleSearch = (selectedKeys, confirm, dataIndex) => {
+  confirm();
+  state.searchText = selectedKeys[0];
+  state.searchedColumn = dataIndex;
+};
+
+const handleReset = clearFilters => {
+  clearFilters({confirm: true});
+  state.searchText = '';
+};
+
+
 const edit = (key: string) => {
   editableData[key] = cloneDeep(dataSource.value.filter(item => key === item.key)[0]);
 };
@@ -211,5 +292,10 @@ const handleAdd = () => {
 
 .editable-cell:hover .editable-cell-icon {
   display: inline-block;
+}
+
+.highlight {
+  background-color: rgb(255, 192, 105);
+  padding: 0;
 }
 </style>
