@@ -43,12 +43,12 @@
         <span>
           <a-tag
             :color="
-              record.status === '0'
+              record.user_status === '0'
                 ? 'red'
                 :'green'
             "
           >
-            {{ record.status === '0' ? '冻结':'激活' }}
+            {{ record.user_status === '0' ? '冻结':'激活' }}
           </a-tag>
         </span>
       </template>
