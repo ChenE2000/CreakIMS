@@ -8,39 +8,61 @@
   >
   <a-table bordered :data-source="dataSource" :columns="columns">
     <template #customFilterIcon="{ filtered, column }">
-      <template v-if="column.dataIndex === 'name'">
+      <template v-if="column.dataIndex === 'name' || column.dataIndex === 'info'">
         <search-outlined/>
       </template>
       <template v-else>
         <filter-outlined/>
       </template>
     </template>
-    <template
-        #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
-    >
-      <div style="padding: 8px">
-        <a-input
-            ref="searchInput"
-            :placeholder="`Search ${column.dataIndex}`"
-            :value="selectedKeys[0]"
-            style="width: 188px; margin-bottom: 8px; display: block"
-            @change="e => setSelectedKeys(e.target.value ? [e.target.value] : [])"
-            @pressEnter="handleSearch(selectedKeys, confirm, column.dataIndex)"
-        />
-        <a-button
-            type="primary"
-            size="small"
-            style="width: 90px; margin-right: 8px"
-            @click="handleSearch(selectedKeys, confirm, column.dataIndex)"
-        >
-          <template #icon>
-            <SearchOutlined/>
-          </template>
-          Search
-        </a-button>
-        <a-button size="small" style="width: 90px" @click="handleReset(clearFilters)">
-          Reset
-        </a-button>
+    <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
+      <div class="drop-down_selector-div">
+        <div style="display: block">
+          <a-input
+              ref="searchInput"
+              :placeholder="'搜索样本名称'"
+              :value="selectedKeys[0]"
+              style="width: 188px; margin-bottom: 8px;"
+              @change="e => setSelectedKeys(e.target.value ? [e.target.value] : [])"
+              @pressEnter="handleSearch(selectedKeys, confirm, column.dataIndex)"
+          >
+            <template #prefix>
+              <file-search-outlined style="color: #BFBFBF"/>
+            </template>
+          </a-input>
+        </div>
+        <a-divider class="selector-div_title">
+          按样本文件类型筛选
+        </a-divider>
+        <div style="margin: 0 7px;">
+          <a-checkbox
+              v-model:checked="state.checkAll"
+              :indeterminate="state.indeterminate"
+              @change="onCheckAllChange"
+          >
+            选择全部
+          </a-checkbox>
+          <a-divider class="selector-div_divider"/>
+          <a-checkbox-group class="selector-div_group"
+                            v-model:value="state.checkedList" :options="state.options"/>
+        </div>
+        <a-divider style="margin: 10px 0"/>
+        <div>
+          <a-button size="small" style="width: 90px; margin-right: 8px" @click="handleReset(clearFilters)">
+            重置
+          </a-button>
+          <a-button
+              type="primary"
+              size="small"
+              style="width: 90px;"
+              @click="handleSearch(selectedKeys, confirm, column.dataIndex)"
+          >
+            <template #icon>
+              <SearchOutlined/>
+            </template>
+            搜索
+          </a-button>
+        </div>
       </div>
     </template>
     <template #bodyCell="{ column, text, record }">
@@ -94,7 +116,23 @@
         <span>
             <a-tooltip placement="bottomLeft">
               <template #title>{{ record.info }}</template>
-              {{ record.info }}
+              <span v-if="state.searchText && state.searchedColumn === column.dataIndex">
+        <template
+            v-for="(fragment, i) in text
+            .toString()
+            .split(new RegExp(`(?<=${state.searchText})|(?=${state.searchText})`, 'i'))"
+        >
+          <mark
+              v-if="fragment.toLowerCase() === state.searchText.toLowerCase()"
+              :key="i"
+              class="highlight"
+          >
+            {{ fragment }}
+          </mark>
+          <template v-else>{{ fragment }}</template>
+        </template>
+      </span>
+              <span v-else>{{ record.info }} </span>
             </a-tooltip>
         </span>
       </template>
@@ -112,9 +150,9 @@
 </template>
 
 <script setup lang="ts">
-import {computed, reactive, Ref, ref} from "vue";
-import {CheckOutlined, EditOutlined, SearchOutlined, FilterOutlined} from "@ant-design/icons-vue";
-import {cloneDeep} from "lodash-es";
+import {computed, reactive, Ref, ref, watch} from "vue";
+import {CheckOutlined, EditOutlined, SearchOutlined, FilterOutlined, FileSearchOutlined} from "@ant-design/icons-vue";
+import {cloneDeep, random} from "lodash-es";
 
 // import { cloneDeep } from 'lodash-es';
 
@@ -127,14 +165,18 @@ interface DataItem {
   info: string;
 }
 
+const numReg = /^[\d|\.]*$/
+
 const columns = [
   {
     title: "样本名称",
     dataIndex: "name",
     width: "30%",
-    customFilterDropdown: true,
+    filterMode: 'tree',
+    filterSearch: true,
     onFilter: (value, record) =>
         record.name.toString().toLowerCase().includes(value.toLowerCase()),
+    customFilterDropdown: true,
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
         setTimeout(() => {
@@ -146,6 +188,8 @@ const columns = [
   {
     title: "缺陷序号",
     dataIndex: "index",
+    sorter: (a: DataItem, b: DataItem) =>
+        Number.parseInt(a.index.split('-')[0]) - Number.parseInt(b.index.split('-')[0])
   },
   {
     title: "缺陷类型",
@@ -182,12 +226,35 @@ const columns = [
   },
   {
     title: "缺陷尺寸",
-    dataIndex: "size"
+    dataIndex: "size",
+    sorter: (a: DataItem, b: DataItem) => {
+      let a_nums = a.size.split('*')
+      let b_nums = b.size.split('*')
+      if (a_nums.length < 2 || b_nums.length < 2) {
+        return a_nums.length - b_nums.length
+      }
+      if (!(numReg.test(a_nums[0]) && numReg.test(a_nums[1]) && numReg.test(b_nums[0]) && numReg.test(b_nums[1]))) {
+        return a_nums.length - b_nums.length
+      }
+      let a_size = Number.parseInt(a_nums[0]) * Number.parseInt(a_nums[1])
+      let b_size = Number.parseInt(b_nums[0]) * Number.parseInt(b_nums[1])
+      return a_size - b_size
+    }
   },
   {
     title: "缺陷信息",
     dataIndex: "info",
     ellipsis: true,
+    customFilterDropdown: true,
+    onFilter: (value, record) =>
+        record.info.toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => {
+          searchInput.value.focus();
+        }, 100);
+      }
+    },
   },
   {
     title: "操作",
@@ -216,22 +283,53 @@ const dataSource: Ref<DataItem[]> = ref([
 const count = computed(() => dataSource.value.length + 1);
 const editableData = reactive({});
 
+const test = (e) => {
+  console.warn("!!!")
+  console.log(e)
+}
+
 const state = reactive({
   searchText: '',
   searchedColumn: '',
+  options: [
+    'JPG', 'PNG',
+  ],
+  checkedList: [],
+  checkAll: false,
+  indeterminate: false,
 });
 
 const searchInput = ref();
 
+const onCheckAllChange = (e: any) => {
+  Object.assign(state, {
+    checkedList: e.target.checked ? state.options : [],
+    indeterminate: false,
+  });
+};
+watch(
+    () => state.checkedList,
+    val => {
+      state.indeterminate = !!val.length && val.length < state.options.length;
+      state.checkAll = val.length === state.options.length;
+    },
+);
+
 const handleSearch = (selectedKeys, confirm, dataIndex) => {
   confirm();
   state.searchText = selectedKeys[0];
+  let i = 1
+  for (let checked of state.checkedList) {
+    selectedKeys[i++] = checked
+  }
+  confirm()
   state.searchedColumn = dataIndex;
 };
 
 const handleReset = clearFilters => {
   clearFilters({confirm: true});
   state.searchText = '';
+  state.checkedList = [];
 };
 
 
@@ -249,8 +347,8 @@ const onDelete = (key: string) => {
 const handleAdd = () => {
   const newData = {
     key: `${count.value}`,
-    name: `${count.value}.jpg`,
-    index: `${count.value - 1}-0`,
+    name: `${count.value}${random(2, true) >= 1 ? '.jpg' : '.png'}`,
+    index: `${count.value - 1}`,
     type: "未焊透",
     size: "134*783",
     info: "最大气孔",
@@ -306,5 +404,29 @@ const handleAdd = () => {
 .highlight {
   background-color: rgb(255, 192, 105);
   padding: 0;
+}
+
+.drop-down_selector-div {
+  padding: 8px;
+
+  .selector-div_title {
+    margin: 10px 0;
+    font-size: 12px;
+    color: #BFBFBF;
+    font-weight: 400;
+  }
+
+  .selector-div_divider {
+    width: 90%;
+    min-width: 90%;
+    margin: 5px 7%;
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+  }
+
+  .selector-div_group {
+    display: flex;
+    flex-direction: column;
+    margin: 0 7px;
+  }
 }
 </style>
