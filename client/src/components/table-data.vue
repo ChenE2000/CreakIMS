@@ -90,6 +90,14 @@
           </a-tag>
         </span>
       </template>
+      <template v-else-if="column.dataIndex === 'info'">
+        <span>
+            <a-tooltip placement="bottomLeft">
+              <template #title>{{ record.info }}</template>
+              {{ record.info }}
+            </a-tooltip>
+        </span>
+      </template>
       <template v-else-if="column.dataIndex === 'operation'">
         <a-popconfirm
             v-if="dataSource.length"
@@ -178,10 +186,11 @@ const columns = [
   },
   {
     title: "缺陷信息",
-    dataIndex: "info"
+    dataIndex: "info",
+    ellipsis: true,
   },
   {
-    title: "operation",
+    title: "操作",
     dataIndex: "operation"
   },
 ];
@@ -193,7 +202,7 @@ const dataSource: Ref<DataItem[]> = ref([
     index: "1",
     type: "未焊透,裂纹",
     size: "134*783",
-    info: "最大气孔",
+    info: "最大气孔walalalalwalalalalwalalalal",
   },
   {
     key: "1",
@@ -201,7 +210,7 @@ const dataSource: Ref<DataItem[]> = ref([
     index: "2",
     type: "未熔合",
     size: "144*383",
-    info: "walalalal",
+    info: "walalalalwalalalalwalalalalwalalalal",
   },
 ]);
 const count = computed(() => dataSource.value.length + 1);
